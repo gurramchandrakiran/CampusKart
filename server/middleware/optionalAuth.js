@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { JWT_SECRET } = require('../config/env');
+const getAuthToken = require('./getAuthToken');
 
 // Optional auth - doesn't fail if token is missing, but sets req.user if present
 const optionalAuth = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
     if (!token) {
       // No token, proceed as unauthenticated
       req.user = null;

@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { JWT_SECRET } = require('../config/env');
+const getAuthToken = require('./getAuthToken');
 
 const adminAuth = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
     if (!token) return res.status(401).json({ message: 'Not authenticated' });
 
     const decoded = jwt.verify(token, JWT_SECRET);

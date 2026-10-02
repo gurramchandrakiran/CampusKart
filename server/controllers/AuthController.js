@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET, SERVER_URL, isProduction } = require('../config/env');
+const getAuthToken = require('../middleware/getAuthToken');
 
 const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 
@@ -118,11 +119,12 @@ exports.logout = (req, res) => {
 
 exports.verify = async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = getAuthToken(req);
     if (!token) return res.status(401).json({ message: "Not logged in" });
 
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.id).select("username isAdmin _id isVerified verificationStatus");
+    if (!user) return res.status(401).json({ message: "User not found" });
     console.log('Verifying user:', user._id, user.username);
     res.json({
       username: user.username,
